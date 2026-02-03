@@ -1,52 +1,134 @@
 # Swiftly (macOS)
+<img src="https://github.com/luanmdang/swiftly/blob/main/swiftly%20ex%201.gif" width="500" alt="Alt text"/>
 
-Dictate with your voice and have it typed anywhere on your Mac.
+I loved using AI dictation to work 4x faster... but the problem was that I sucked at speaking outloud, and was much better at typing out my thoughts!
+
+Swiftly focuses more on structuring the output of what you're saying so that it's well thought out, while still keeping the tone and meaning of what you intended.
+
+(Inspired by Willow Voice they're awesome)
+
+---
 
 ## What is Swiftly?
 
-Swiftly is a menu bar app for your Mac. You press and hold a key, speak, then release—and your words are typed into whatever app is in focus (email, notes, Slack, code, anywhere). A small indicator near the top of your screen shows when it’s recording. Your words are transcribed on your Mac; no audio is sent to the internet unless you choose to add an optional API key for cleaner text.
+Swiftly lives in your menu bar. You **press and hold a key**, speak naturally, then **release**, and your words appear in the currently focused app.
 
-## How it works
+A small indicator near the top of your screen shows when Swiftly is listening.
 
-1. **Hold the key.** Press and hold **Right Option** (or **Right Command**) to start recording.
-2. **Speak.** Say what you want typed. A small bar at the top of your screen shows that Swiftly is listening.
-3. **Release.** Let go of the key. Swiftly turns your speech into text and types it into the active app.
+**Privacy-first by default:** transcription happens on your Mac. No audio is sent to the internet **unless you choose** to enable optional “cleaner text” using your own API key.
 
-That’s it. No need to switch apps or paste—just talk and it appears where your cursor is.
+---
+
+## How it works (the user flow)
+
+1. **Hold the key** — Press and hold **Right Option** (or **Right Command**) to start recording.
+2. **Speak** — Say what you want typed. The on-screen indicator confirms Swiftly is listening.
+3. **Release** — Let go of the key. Swiftly transcribes and types the result into the active app.
+
+No app switching, no copy/paste, no “dictation mode.” Just speak where you’re already working.
+
+![](https://github.com/luanmdang/swiftly/blob/main/notch%20ui.gif)
+
+<img src="https://github.com/luanmdang/swiftly/blob/main/swiftly%20onboarding%20screen.png" width="500" alt="Alt text"/>
+
+---
+
+## Under the hood (the pipeline)
+
+Swiftly follows a simple chain:
+
+**Voice → OpenAI Whisper transcription → (optional) quick LLM rewrite → typed output**
+
+- **Raw transcription:** Swiftly runs the **Whisper** model locally to convert audio into text.
+- **Optional cleanup (recommended):** if you add an API key, Swiftly sends *only the text* (not audio) to a fast LLM to:
+  - remove filler (“um”, “uh”)
+  - fix punctuation + casing
+  - reword for clarity while keeping meaning
+- **Typing into the active app:** Swiftly then “types” the final text into whatever has focus using macOS Accessibility.
+
+If you don’t enable cleanup, Swiftly simply types the raw transcription.
+
+---
 
 ## Requirements
 
-- **Mac** with macOS 14 (Sonoma) or later (Apple Silicon or Intel).
-- **Permissions:** Swiftly will ask for **Accessibility** (so the hotkey and typing work) and **Microphone** (so it can hear you). Both are required for the app to work.
+- **Mac** running macOS 14 (Sonoma) or later (Apple Silicon or Intel).
+- **Permissions (required):**
+  - **Accessibility** — so the hotkey + typing works
+  - **Microphone** — so Swiftly can record audio
+
+---
 
 ## Getting started
 
-1. **Download** the latest release from the [Releases](https://github.com/luanmdang/swiftly/releases) page, or open the project in Xcode and run it (Product → Run).
-2. **First launch:** Swiftly appears as an icon in your menu bar. If you see an onboarding flow, follow the steps. When macOS asks for Accessibility and Microphone access, click **Open System Settings** and turn them on for Swiftly (or for Xcode if you’re running from Xcode).
-3. **Try it:** Click in any text field (Notes, Mail, Messages, etc.), hold **Right Option**, say a sentence, then release. The text should appear.
+1. **Install**
+   - Download the latest release from the Releases page:
+     https://github.com/luanmdang/swiftly/releases
+   - Or open the project in Xcode and run it (**Product → Run**).
 
-Your API keys are never stored in the app’s code—only in your Mac’s Keychain, and only if you add them yourself.
+#### **Important** Issue: "swiftly" Not Opened
+
+<img width="295" height="351" alt="PNG image" src="https://github.com/user-attachments/assets/73aaa534-ce79-42f1-9e21-ec2daecdc570" />
+
+- This is because I don't have a developer license (too expensive). Just click the "?" top right and follow the instructions.
+- It goes without saying proceed at your own discretion!
+
+
+3. **First launch**
+   - Swiftly appears as a menu bar icon.
+   - When macOS prompts for permissions, click **Open System Settings** and enable:
+     - **Privacy & Security → Accessibility**
+     - **Privacy & Security → Microphone**
+   - If you’re running from Xcode, grant permissions to **Xcode** instead.
+
+4. **Try it**
+   - Click into any text field (Notes, Mail, Messages, etc.)
+   - Hold **Right Option**, say a sentence, release
+   - Your text should appear instantly
+
+**API keys are never stored in the repo.** If you add a key, it’s saved only in your Mac’s **Keychain**.
+
+---
 
 ## Optional: Cleaner text with an API key
 
-Out of the box, Swiftly types what you say. If you add a free **API key** (for example from Google’s Gemini), Swiftly can tidy up your words: remove filler like “um” and “uh,” fix punctuation, and keep the meaning the same. This step is **optional**; the app works great without it.
+By default, Swiftly types exactly what Whisper transcribes.
 
-- **Get a free key:** [Google AI Studio](https://aistudio.google.com/app/apikey) (Gemini).  
-- **Add it in Swiftly:** Click the menu bar icon → **Settings** → enter your key and save. You can also add keys for other providers (e.g. OpenAI, Claude) if you use them.
+If you add an API key, Swiftly can “polish” your text: remove filler, fix punctuation, and reword for clarity—without changing meaning.
 
-I use Gemini 2.5 Flash Lite! Fast and cheap.
+- Get a key (Gemini):
+  https://aistudio.google.com/app/apikey
+- Add it in Swiftly:
+  **Menu bar icon → Settings → paste key → Save**
+
+You can also use other providers (e.g., OpenAI, Claude) if you prefer.
+
+**What I use:** Gemini 2.5 Flash Lite — fast + cheap.
+
+---
 
 ## Troubleshooting
 
-- **The hotkey does nothing.**  
-  Swiftly needs **Accessibility** permission. Open **System Settings → Privacy & Security → Accessibility** and ensure **Swiftly** (or **Xcode** if you’re running from Xcode) is listed and enabled. If it’s already on, turn it off and on again, then quit and reopen Swiftly.
+- **The hotkey does nothing**
+  - Swiftly needs **Accessibility** permission.
+  - Check: **System Settings → Privacy & Security → Accessibility**
+  - Ensure **Swiftly** (or **Xcode** if running from Xcode) is enabled.
+  - If it’s already enabled: toggle it off/on, then quit and reopen Swiftly.
 
-- **Nothing is typed / microphone doesn’t work.**  
-  Check **System Settings → Privacy & Security → Microphone** and ensure Swiftly (or Xcode) is allowed. Restart the app after changing this.
+- **Nothing is typed / microphone doesn’t work**
+  - Check: **System Settings → Privacy & Security → Microphone**
+  - Ensure Swiftly (or Xcode) is allowed.
+  - Restart the app after changing the setting.
 
-- **Something else?**  
-  Open an [issue](https://github.com/luanmdang/swiftly/issues) on GitHub and describe what you see. I’m happy to help.
+- **Something else?**
+  - Open an issue on GitHub and include what you expected vs what happened:
+    https://github.com/luanmdang/swiftly/issues
+
+---
+
+Disclaimer: The cute emoji logo is not mine
 
 ## License
 
-This project is open source. See the repository for license terms. If a `LICENSE` file is included, that file applies.
+This project is open source. See the repository for license terms.
+If a `LICENSE` file is included, that file applies.

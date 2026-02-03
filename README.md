@@ -35,7 +35,7 @@ No app switching, no copy/paste, no “dictation mode.” Just speak where you�
 
 Swiftly follows a simple chain:
 
-**Voice → Whisper transcription → (optional) quick LLM rewrite → typed output**
+**Voice → OpenAI Whisper transcription → (optional) quick LLM rewrite → typed output**
 
 - **Raw transcription:** Swiftly runs the **Whisper** model locally to convert audio into text.
 - **Optional cleanup (recommended):** if you add an API key, Swiftly sends *only the text* (not audio) to a fast LLM to:
@@ -64,10 +64,12 @@ If you don’t enable cleanup, Swiftly simply types the raw transcription.
      https://github.com/luanmdang/swiftly/releases
    - Or open the project in Xcode and run it (**Product → Run**).
 
-**Important** Issue: "swiftly" Not Opened
+#### **Important** Issue: "swiftly" Not Opened
+
 <img width="295" height="351" alt="PNG image" src="https://github.com/user-attachments/assets/73aaa534-ce79-42f1-9e21-ec2daecdc570" />
-This is because I don't have a developer license (too expensive). Just click the "?" top right and follow the instructions.
-It goes without saying proceed at your own discretion!
+
+- This is because I don't have a developer license (too expensive). Just click the "?" top right and follow the instructions.
+- It goes without saying proceed at your own discretion!
 
 
 3. **First launch**

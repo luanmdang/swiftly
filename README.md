@@ -5,6 +5,8 @@ I loved using AI dictation to work 4x faster... but the problem was that I sucke
 
 Swiftly focuses more on structuring the output of what you're saying so that it's well thought out, while still keeping the tone and meaning of what you intended.
 
+(Inspired by Willow Voice they're awesome)
+
 ---
 
 ## What is Swiftly?

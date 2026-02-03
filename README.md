@@ -64,14 +64,20 @@ If you don’t enable cleanup, Swiftly simply types the raw transcription.
      https://github.com/luanmdang/swiftly/releases
    - Or open the project in Xcode and run it (**Product → Run**).
 
-2. **First launch**
+**Important** Issue: "swiftly" Not Opened
+<img width="295" height="351" alt="PNG image" src="https://github.com/user-attachments/assets/73aaa534-ce79-42f1-9e21-ec2daecdc570" />
+This is because I don't have a developer license (too expensive). Just click the "?" top right and follow the instructions.
+It goes without saying proceed at your own discretion!
+
+
+3. **First launch**
    - Swiftly appears as a menu bar icon.
    - When macOS prompts for permissions, click **Open System Settings** and enable:
      - **Privacy & Security → Accessibility**
      - **Privacy & Security → Microphone**
    - If you’re running from Xcode, grant permissions to **Xcode** instead.
 
-3. **Try it**
+4. **Try it**
    - Click into any text field (Notes, Mail, Messages, etc.)
    - Hold **Right Option**, say a sentence, release
    - Your text should appear instantly

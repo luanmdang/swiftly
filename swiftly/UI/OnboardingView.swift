@@ -346,23 +346,40 @@ struct OnboardingView: View {
             .padding(.top, 20)
 
             VStack(spacing: 12) {
-                permissionCard(
-                    icon: "keyboard.fill",
-                    title: "Accessibility",
-                    subtitle: "Hotkey & typing",
-                    isGranted: PermissionsManager.shared.checkAccessibilityPermission()
-                )
+                Button {
+                    if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    permissionCard(
+                        icon: "keyboard.fill",
+                        title: "Accessibility",
+                        subtitle: "Hotkey & typing",
+                        isGranted: PermissionsManager.shared.checkAccessibilityPermission()
+                    )
+                }
+                .buttonStyle(.plain)
 
-                permissionCard(
-                    icon: "mic.fill",
-                    title: "Microphone",
-                    subtitle: "Voice recording",
-                    isGranted: PermissionsManager.shared.checkMicrophonePermission()
-                )
+                Button {
+                    if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    permissionCard(
+                        icon: "mic.fill",
+                        title: "Microphone",
+                        subtitle: "Voice recording",
+                        isGranted: PermissionsManager.shared.checkMicrophonePermission()
+                    )
+                }
+                .buttonStyle(.plain)
             }
             .padding(.top, 28)
 
             Button {
+                if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy") {
+                    NSWorkspace.shared.open(url)
+                }
                 PermissionsManager.shared.requestAccessibilityPermission()
                 PermissionsManager.shared.requestMicrophonePermission { _ in }
             } label: {

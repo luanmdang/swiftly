@@ -21,6 +21,8 @@ A small indicator near the top of your screen shows when Swiftly is listening.
 
 No app switching, no copy/paste, no “dictation mode.” Just speak where you’re already working.
 
+<img src="https://github.com/luanmdang/swiftly/blob/main/swiftly%20onboarding%20screen.png" width="500" alt="Alt text"/>
+
 ---
 
 ## Under the hood (the pipeline)
@@ -107,6 +109,8 @@ You can also use other providers (e.g., OpenAI, Claude) if you prefer.
     https://github.com/luanmdang/swiftly/issues
 
 ---
+
+Disclaimer: The cute emoji logo is not mine
 
 ## License
 

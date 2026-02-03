@@ -45,7 +45,7 @@ I use Gemini 2.5 Flash Lite! Fast and cheap.
   Check **System Settings → Privacy & Security → Microphone** and ensure Swiftly (or Xcode) is allowed. Restart the app after changing this.
 
 - **Something else?**  
-  Open an [issue](https://github.com/luanmdang/swiftly/issues) on GitHub and describe what you see. We’re happy to help.
+  Open an [issue](https://github.com/luanmdang/swiftly/issues) on GitHub and describe what you see. I’m happy to help.
 
 ## License
 

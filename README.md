@@ -3,7 +3,7 @@
 
 I loved using AI dictation to work 4x faster... but the problem was that I sucked at speaking outloud, and was much better at typing out my thoughts!
 
-So I made Swiftly so that I can talk freely and still have nicely structured, professional, and well-thought-out sentences that still keeps my tone and meaning first. 
+Swiftly focuses more on structuring the output of what you're saying so that it's well thought out, while still keeping the tone and meaning of what you intended.
 
 ---
 

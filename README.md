@@ -70,7 +70,7 @@ If you don’t enable cleanup, Swiftly simply types the raw transcription.
 
 <img width="295" height="351" alt="PNG image" src="https://github.com/user-attachments/assets/73aaa534-ce79-42f1-9e21-ec2daecdc570" />
 
-- This is because I don't have a developer license (too expensive). Just click the "?" top right and follow the instructions.
+- This is because I don't have a developer license so the app isn't verified. Just click the "?" top right and follow the instructions.
 - It goes without saying proceed at your own discretion!
 
 

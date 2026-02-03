@@ -1,14 +1,14 @@
 # Swiftly (macOS)
 
-Hold a key. Talk. Let go. Swiftly types it—anywhere your cursor is.
+Hold a key. Talk. Let go. Swiftly types it anywhere your cursor is.
 
-Swiftly is a tiny menu bar app that turns voice into keystrokes across your Mac: email, notes, chat, terminals, code editors—wherever you can type.
+Swiftly is a tiny menu bar app that turns voice into keystrokes across your Mac: email, notes, chat, terminals, code editors, wherever you can type.
 
 ---
 
 ## What is Swiftly?
 
-Swiftly lives in your menu bar. You **press and hold a key**, speak naturally, then **release**—and your words appear in the currently focused app.
+Swiftly lives in your menu bar. You **press and hold a key**, speak naturally, then **release**, and your words appear in the currently focused app.
 
 A small indicator near the top of your screen shows when Swiftly is listening.
 

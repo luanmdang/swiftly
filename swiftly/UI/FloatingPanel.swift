@@ -3,7 +3,7 @@ import Cocoa
 class FloatingPanel: NSPanel {
     init() {
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 280, height: 32),
+            contentRect: NSRect(x: 0, y: 0, width: 340, height: 32),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -15,7 +15,7 @@ class FloatingPanel: NSPanel {
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         isOpaque = false
         backgroundColor = .clear
-        hasShadow = false  // The SwiftUI view handles its own shadow
+        hasShadow = false  // No shadow - blends with notch
 
         // Don't take focus from other apps
         becomesKeyOnlyIfNeeded = true

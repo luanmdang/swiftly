@@ -65,9 +65,17 @@ enum AIProviderType: String, CaseIterable, Codable {
     }
 }
 
+struct ProviderResponse {
+    let text: String
+    let inputTokens: Int
+    let outputTokens: Int
+
+    var totalTokens: Int { inputTokens + outputTokens }
+}
+
 protocol AIProvider {
     var providerType: AIProviderType { get }
-    func clean(text: String, apiKey: String, model: String, systemPrompt: String?) async throws -> String
+    func clean(text: String, apiKey: String, model: String, systemPrompt: String?) async throws -> ProviderResponse
 }
 
 enum AIProviderError: Error, LocalizedError {

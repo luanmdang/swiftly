@@ -50,40 +50,49 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
+        updateMenu()
+    }
+
+    private func updateMenu() {
         let menu = NSMenu()
 
-        let statusMenuItem = NSMenuItem(title: "Status: Initializing...", action: nil, keyEquivalent: "")
-        statusMenuItem.tag = 100
-        menu.addItem(statusMenuItem)
+        // SwiftUI menu content
+        let menuContentView = MenuContentView(
+            onSettings: { [weak self] in
+                self?.statusItem.menu?.cancelTracking()
+                self?.openSettings()
+            },
+            onCheckPermissions: { [weak self] in
+                self?.statusItem.menu?.cancelTracking()
+                self?.checkAndRequestPermissions()
+            },
+            onQuit: { [weak self] in
+                self?.quitApp()
+            }
+        ).environmentObject(appState)
 
-        menu.addItem(NSMenuItem.separator())
+        let hostingView = NSHostingView(rootView: menuContentView)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 240, height: 220)
 
-        menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
-        menu.addItem(NSMenuItem(title: "Check Permissions", action: #selector(checkAndRequestPermissions), keyEquivalent: ""))
-
-        menu.addItem(NSMenuItem.separator())
-
-        menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
+        let menuItem = NSMenuItem()
+        menuItem.view = hostingView
+        menu.addItem(menuItem)
 
         statusItem.menu = menu
+    }
 
-        appState.onStatusChange = { [weak self] status in
-            DispatchQueue.main.async {
-                if let menuItem = self?.statusItem.menu?.item(withTag: 100) {
-                    menuItem.title = "Status: \(status.description)"
-                }
-            }
-        }
+    private func updateStatsMenuItem() {
+        updateMenu()
     }
 
     private func setupFloatingPanel() {
         floatingPanel = FloatingPanel()
 
         let hostingView = NSHostingView(rootView: StatusIndicatorView().environmentObject(appState))
-        hostingView.frame = NSRect(x: 0, y: 0, width: 280, height: 32)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 340, height: 32)
 
         floatingPanel.contentView = hostingView
-        floatingPanel.setContentSize(NSSize(width: 280, height: 32))
+        floatingPanel.setContentSize(NSSize(width: 340, height: 32))
     }
 
     private func setupComponents() {
@@ -200,6 +209,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         appState.status = .processing
 
         let audioData = audioRecorder.stopRecording()
+        let recordingDuration = audioRecorder.lastRecordingDuration
 
         Task {
             do {
@@ -217,12 +227,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
 
                 // Clean text with AI provider if configured
-                let cleanedText: String
+                var cleanedText: String = rawText
+                var apiTokens: Int = 0
+                var usedProvider: AIProviderType = UserPreferences.shared.selectedProvider
+
                 if ProviderManager.shared.hasAPIKeyConfigured {
                     do {
                         print("[Notch UI] Calling AI provider to clean text...")
-                        cleanedText = try await ProviderManager.shared.clean(text: rawText)
-                        print("[Notch UI] AI provider success, cleaned text length: \(cleanedText.count)")
+                        let result = try await ProviderManager.shared.clean(text: rawText)
+                        cleanedText = result.text
+                        apiTokens = result.tokens
+                        usedProvider = result.provider
+                        print("[Notch UI] AI provider success, cleaned text length: \(cleanedText.count), tokens: \(apiTokens)")
                     } catch {
                         print("[Notch UI] AI provider ERROR: \(error.localizedDescription)")
                         print("[Notch UI] Using raw transcription instead")
@@ -230,17 +246,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                 } else {
                     print("[Notch UI] No API key configured, using raw transcription")
-                    cleanedText = rawText
                 }
+
+                // Calculate word count
+                let wordCount = cleanedText.components(separatedBy: .whitespacesAndNewlines)
+                    .filter { !$0.isEmpty }.count
+                let charCount = cleanedText.count
+
+                // Record stats
+                UserPreferences.shared.recordTranscription(
+                    words: wordCount,
+                    chars: charCount,
+                    duration: recordingDuration,
+                    apiTokens: apiTokens,
+                    provider: usedProvider
+                )
 
                 // Type the result
                 await MainActor.run {
+                    appState.recordSessionTranscription(words: wordCount, tokens: apiTokens)
                     appState.status = .done
 
                     savedFrontmostApp?.activate()
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                         self?.keyboardOutput.type(text: cleanedText)
+                        self?.updateStatsMenuItem()
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                             self?.hidePanel()
@@ -267,30 +298,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let screenFrame = screen.frame
         let panelSize = floatingPanel.frame.size
 
+        // Position flush with top of screen, wings blend with notch edges
         let x = screenFrame.midX - panelSize.width / 2
         let y = screenFrame.maxY - panelSize.height
 
         floatingPanel.setFrameOrigin(NSPoint(x: x, y: y))
-
-        floatingPanel.alphaValue = 0
         floatingPanel.orderFrontRegardless()
-
-        NSAnimationContext.runAnimationGroup({ context in
-            context.duration = 0.15
-            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            floatingPanel.animator().alphaValue = 1
-        })
     }
 
     private func hidePanel() {
-        NSAnimationContext.runAnimationGroup({ context in
-            context.duration = 0.2
-            context.timingFunction = CAMediaTimingFunction(name: .easeIn)
-            floatingPanel.animator().alphaValue = 0
-        }, completionHandler: { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
             self?.floatingPanel.orderOut(nil)
-            self?.floatingPanel.alphaValue = 1
-        })
+        }
     }
 
     @objc private func openSettings() {

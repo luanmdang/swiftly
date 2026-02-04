@@ -38,8 +38,10 @@ class OpenAIProvider: AIProvider {
     Output ONLY the cleaned text, nothing else.
     """
 
-    func clean(text: String, apiKey: String, model: String, systemPrompt: String?) async throws -> String {
-        guard !text.isEmpty else { return text }
+    func clean(text: String, apiKey: String, model: String, systemPrompt: String?) async throws -> ProviderResponse {
+        guard !text.isEmpty else {
+            return ProviderResponse(text: text, inputTokens: 0, outputTokens: 0)
+        }
 
         guard let url = URL(string: endpoint) else {
             throw AIProviderError.invalidResponse
@@ -83,6 +85,18 @@ class OpenAIProvider: AIProvider {
             throw AIProviderError.parseError
         }
 
-        return cleanedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Extract token usage from response
+        var inputTokens = 0
+        var outputTokens = 0
+        if let usage = json["usage"] as? [String: Any] {
+            inputTokens = usage["prompt_tokens"] as? Int ?? 0
+            outputTokens = usage["completion_tokens"] as? Int ?? 0
+        }
+
+        return ProviderResponse(
+            text: cleanedText.trimmingCharacters(in: .whitespacesAndNewlines),
+            inputTokens: inputTokens,
+            outputTokens: outputTokens
+        )
     }
 }

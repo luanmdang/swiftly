@@ -40,8 +40,10 @@ class GeminiProvider: AIProvider {
     Input:
     """
 
-    func clean(text: String, apiKey: String, model: String, systemPrompt: String?) async throws -> String {
-        guard !text.isEmpty else { return text }
+    func clean(text: String, apiKey: String, model: String, systemPrompt: String?) async throws -> ProviderResponse {
+        guard !text.isEmpty else {
+            return ProviderResponse(text: text, inputTokens: 0, outputTokens: 0)
+        }
 
         let endpoint = "\(baseEndpoint)/\(model):generateContent?key=\(apiKey)"
         guard let url = URL(string: endpoint) else {
@@ -91,6 +93,18 @@ class GeminiProvider: AIProvider {
             throw AIProviderError.parseError
         }
 
-        return cleanedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Extract token usage from usageMetadata (Gemini API format)
+        var inputTokens = 0
+        var outputTokens = 0
+        if let usageMetadata = json["usageMetadata"] as? [String: Any] {
+            inputTokens = usageMetadata["promptTokenCount"] as? Int ?? 0
+            outputTokens = usageMetadata["candidatesTokenCount"] as? Int ?? 0
+        }
+
+        return ProviderResponse(
+            text: cleanedText.trimmingCharacters(in: .whitespacesAndNewlines),
+            inputTokens: inputTokens,
+            outputTokens: outputTokens
+        )
     }
 }

@@ -5,9 +5,12 @@ class AudioRecorder {
     private var audioEngine: AVAudioEngine?
     private var audioData: [Float] = []
     private let targetSampleRate: Double = 16000
+    private var recordingStartTime: Date?
+    private(set) var lastRecordingDuration: Double = 0
 
     func startRecording() throws {
         audioData = []
+        recordingStartTime = Date()
 
         let audioEngine = AVAudioEngine()
         self.audioEngine = audioEngine
@@ -25,6 +28,11 @@ class AudioRecorder {
     }
 
     func stopRecording() -> [Float] {
+        if let startTime = recordingStartTime {
+            lastRecordingDuration = Date().timeIntervalSince(startTime)
+        }
+        recordingStartTime = nil
+
         audioEngine?.inputNode.removeTap(onBus: 0)
         audioEngine?.stop()
         audioEngine = nil

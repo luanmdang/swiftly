@@ -55,6 +55,9 @@ struct SettingsView: View {
                         warningBanner
                     }
 
+                    // Analytics Card
+                    AnalyticsCardView()
+
                     // Provider Selection Card
                     settingsCard {
                         VStack(alignment: .leading, spacing: 16) {

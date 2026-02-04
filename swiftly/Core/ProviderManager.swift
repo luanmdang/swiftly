@@ -27,7 +27,13 @@ class ProviderManager {
         KeychainManager.shared.hasAnyAPIKey()
     }
 
-    func clean(text: String) async throws -> String {
+    struct CleanResult {
+        let text: String
+        let tokens: Int
+        let provider: AIProviderType
+    }
+
+    func clean(text: String) async throws -> CleanResult {
         let provider = currentProvider
         let model = currentModel
 
@@ -40,10 +46,11 @@ class ProviderManager {
         }
 
         let systemPrompt = UserPreferences.shared.isCodingMode ? UserPreferences.shared.codingModeInstructions : nil
-        return try await aiProvider.clean(text: text, apiKey: apiKey, model: model, systemPrompt: systemPrompt)
+        let response = try await aiProvider.clean(text: text, apiKey: apiKey, model: model, systemPrompt: systemPrompt)
+        return CleanResult(text: response.text, tokens: response.totalTokens, provider: provider)
     }
 
-    func clean(text: String, using provider: AIProviderType, model: String? = nil) async throws -> String {
+    func clean(text: String, using provider: AIProviderType, model: String? = nil) async throws -> CleanResult {
         let modelToUse = model ?? provider.defaultModel
 
         guard let apiKey = KeychainManager.shared.getAPIKey(for: provider) else {
@@ -55,7 +62,8 @@ class ProviderManager {
         }
 
         let systemPrompt = UserPreferences.shared.isCodingMode ? UserPreferences.shared.codingModeInstructions : nil
-        return try await aiProvider.clean(text: text, apiKey: apiKey, model: modelToUse, systemPrompt: systemPrompt)
+        let response = try await aiProvider.clean(text: text, apiKey: apiKey, model: modelToUse, systemPrompt: systemPrompt)
+        return CleanResult(text: response.text, tokens: response.totalTokens, provider: provider)
     }
 
     func setProvider(_ provider: AIProviderType) {

@@ -27,8 +27,6 @@ A small indicator near the top of your screen shows when Swiftly is listening.
 
 No app switching, no copy/paste, no “dictation mode.” Just speak where you’re already working.
 
-![](https://github.com/luanmdang/swiftly/blob/main/notch%20ui.gif)
-
 <img src="https://github.com/luanmdang/swiftly/blob/main/swiftly%20onboarding%20screen.png" width="500" alt="Alt text"/>
 
 ---

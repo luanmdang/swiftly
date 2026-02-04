@@ -1,4 +1,5 @@
-# Swiftly (macOS)
+# Swiftly (macOS) <img src="https://github.com/luanmdang/swiftly/blob/main/swiftly/Resources/swiftly_squiggle.png" width="35" alt="logo"/>
+
 <img src="https://github.com/luanmdang/swiftly/blob/main/swiftly%20ex%201.gif" width="500" alt="Alt text"/>
 
 I loved using AI dictation to work 4x faster... but the problem was that I sucked at speaking outloud, and was much better at typing out my thoughts!

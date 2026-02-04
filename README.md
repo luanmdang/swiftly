@@ -1,4 +1,5 @@
-# Swiftly (macOS)
+# Swiftly (macOS) <img src="https://github.com/luanmdang/swiftly/blob/main/swiftly/Resources/swiftly_squiggle.png" width="35" alt="logo"/>
+
 <img src="https://github.com/luanmdang/swiftly/blob/main/swiftly%20ex%201.gif" width="500" alt="Alt text"/>
 
 I loved using AI dictation to work 4x faster... but the problem was that I sucked at speaking outloud, and was much better at typing out my thoughts!
@@ -26,8 +27,6 @@ A small indicator near the top of your screen shows when Swiftly is listening.
 3. **Release** — Let go of the key. Swiftly transcribes and types the result into the active app.
 
 No app switching, no copy/paste, no “dictation mode.” Just speak where you’re already working.
-
-![](https://github.com/luanmdang/swiftly/blob/main/notch%20ui.gif)
 
 <img src="https://github.com/luanmdang/swiftly/blob/main/swiftly%20onboarding%20screen.png" width="500" alt="Alt text"/>
 

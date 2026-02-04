@@ -21,6 +21,12 @@ struct OnboardingView: View {
     @State private var pulseAnimation: Bool = false
     @State private var completionScale: CGFloat = 0.5
 
+    // Hover state tracking
+    @State private var hoveredFeature: String? = nil
+    @State private var hoveredPermission: String? = nil
+    @State private var primaryButtonHovered = false
+    @State private var secondaryButtonHovered = false
+
     var onComplete: () -> Void
 
     // YC Startup color palette - sophisticated dark with warm accent
@@ -49,7 +55,11 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            bgGradient.ignoresSafeArea()
+            // Layered blur background for depth
+            VisualEffectBlur(material: .sidebar, blendingMode: .behindWindow)
+                .ignoresSafeArea()
+            bgGradient.opacity(0.9)
+                .ignoresSafeArea()
 
             // Subtle noise texture overlay
             Rectangle()
@@ -191,7 +201,9 @@ struct OnboardingView: View {
     }
 
     private func featureCard(icon: String, isSystemIcon: Bool, title: String, subtitle: String) -> some View {
-        HStack(spacing: 14) {
+        let cardId = title
+        let isHovered = hoveredFeature == cardId
+        return HStack(spacing: 14) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(cardBg)
@@ -225,9 +237,14 @@ struct OnboardingView: View {
                 .fill(cardBg)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(cardBorder, lineWidth: 1)
+                        .stroke(isHovered ? Color.white.opacity(0.12) : cardBorder, lineWidth: 1)
                 )
         )
+        .scaleEffect(isHovered ? 1.02 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isHovered)
+        .onHover { hovering in
+            hoveredFeature = hovering ? cardId : nil
+        }
     }
 
     private func keyCap(_ text: String) -> some View {
@@ -405,7 +422,10 @@ struct OnboardingView: View {
     }
 
     private func permissionCard(icon: String, title: String, subtitle: String, isGranted: Bool) -> some View {
-        HStack(spacing: 14) {
+        let cardId = title
+        let isHovered = hoveredPermission == cardId
+        let borderColor = isGranted ? Color.green.opacity(isHovered ? 0.4 : 0.2) : (isHovered ? Color.white.opacity(0.12) : cardBorder)
+        return HStack(spacing: 14) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(isGranted ? Color.green.opacity(0.15) : cardBg)
@@ -437,9 +457,14 @@ struct OnboardingView: View {
                 .fill(cardBg)
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
-                        .stroke(isGranted ? Color.green.opacity(0.2) : cardBorder, lineWidth: 1)
+                        .stroke(borderColor, lineWidth: 1)
                 )
         )
+        .scaleEffect(isHovered ? 1.02 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isHovered)
+        .onHover { hovering in
+            hoveredPermission = hovering ? cardId : nil
+        }
     }
 
     // MARK: - API Setup
@@ -644,34 +669,11 @@ struct OnboardingView: View {
     // MARK: - Buttons
 
     private func primaryButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(.white)
-                .padding(.horizontal, 28)
-                .padding(.vertical, 14)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(accentGradient)
-                        .shadow(color: accent.opacity(0.4), radius: 12, y: 4)
-                )
-        }
-        .buttonStyle(.plain)
+        PrimaryButtonView(title: title, accent: accent, accentGradient: accentGradient, action: action)
     }
 
     private func secondaryButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(accent)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(accent.opacity(0.5), lineWidth: 1.5)
-                )
-        }
-        .buttonStyle(.plain)
+        SecondaryButtonView(title: title, accent: accent, action: action)
     }
 
     // MARK: - Actions
@@ -726,5 +728,81 @@ struct OnboardingView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             withAnimation { saveStatus = "" }
         }
+    }
+}
+
+// MARK: - Primary Button with Hover
+
+struct PrimaryButtonView: View {
+    let title: String
+    let accent: Color
+    let accentGradient: LinearGradient
+    let action: () -> Void
+
+    @State private var isHovered = false
+    @State private var isPressed = false
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.white)
+                .padding(.horizontal, 28)
+                .padding(.vertical, 14)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(accentGradient)
+                        .shadow(color: accent.opacity(isHovered ? 0.6 : 0.4), radius: isHovered ? 16 : 12, y: 4)
+                )
+        }
+        .buttonStyle(.plain)
+        .scaleEffect(isPressed ? 0.97 : (isHovered ? 1.03 : 1.0))
+        .animation(.easeInOut(duration: 0.15), value: isHovered)
+        .animation(.easeInOut(duration: 0.1), value: isPressed)
+        .onHover { hovering in
+            isHovered = hovering
+        }
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in isPressed = true }
+                .onEnded { _ in isPressed = false }
+        )
+    }
+}
+
+// MARK: - Secondary Button with Hover
+
+struct SecondaryButtonView: View {
+    let title: String
+    let accent: Color
+    let action: () -> Void
+
+    @State private var isHovered = false
+    @State private var isPressed = false
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(accent)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(accent.opacity(isHovered ? 0.8 : 0.5), lineWidth: 1.5)
+                )
+        }
+        .buttonStyle(.plain)
+        .scaleEffect(isPressed ? 0.97 : (isHovered ? 1.02 : 1.0))
+        .animation(.easeInOut(duration: 0.15), value: isHovered)
+        .animation(.easeInOut(duration: 0.1), value: isPressed)
+        .onHover { hovering in
+            isHovered = hovering
+        }
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in isPressed = true }
+                .onEnded { _ in isPressed = false }
+        )
     }
 }

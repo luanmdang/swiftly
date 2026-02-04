@@ -263,22 +263,4 @@ struct MenuActionRow: View {
     }
 }
 
-// MARK: - Visual Effect Blur (NSVisualEffectView wrapper)
-
-struct VisualEffectBlur: NSViewRepresentable {
-    let material: NSVisualEffectView.Material
-    let blendingMode: NSVisualEffectView.BlendingMode
-
-    func makeNSView(context: Context) -> NSVisualEffectView {
-        let view = NSVisualEffectView()
-        view.material = material
-        view.blendingMode = blendingMode
-        view.state = .active
-        return view
-    }
-
-    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
-        nsView.material = material
-        nsView.blendingMode = blendingMode
-    }
-}
+// VisualEffectBlur is now defined in SharedComponents.swift

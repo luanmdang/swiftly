@@ -3,6 +3,7 @@ import SwiftUI
 struct AnalyticsCardView: View {
     @EnvironmentObject var appState: AppState
     @State private var showResetConfirmation = false
+    @State private var hoveredTile: String? = nil
 
     // Matching the polished dark palette from SettingsView
     private let cardBg = Color.white.opacity(0.03)
@@ -28,9 +29,9 @@ struct AnalyticsCardView: View {
 
                 // Big stat tiles
                 HStack(spacing: 12) {
-                    statTile(value: formattedWords, label: "words")
-                    statTile(value: "\(stats.totalTranscriptions)", label: "transcripts")
-                    statTile(value: formattedTimeSaved, label: "saved")
+                    statTile(id: "words", value: formattedWords, label: "words")
+                    statTile(id: "transcripts", value: "\(stats.totalTranscriptions)", label: "transcripts")
+                    statTile(id: "saved", value: formattedTimeSaved, label: "saved")
                 }
 
                 // Session stats (subtle)
@@ -90,8 +91,9 @@ struct AnalyticsCardView: View {
 
     // MARK: - Stat Tile
 
-    private func statTile(value: String, label: String) -> some View {
-        VStack(spacing: 4) {
+    private func statTile(id: String, value: String, label: String) -> some View {
+        let isHovered = hoveredTile == id
+        return VStack(spacing: 4) {
             Text(value)
                 .font(.system(size: 24, weight: .bold, design: .rounded))
                 .foregroundColor(textPrimary)
@@ -103,8 +105,17 @@ struct AnalyticsCardView: View {
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color.white.opacity(0.04))
+                .fill(Color.white.opacity(isHovered ? 0.06 : 0.04))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.white.opacity(isHovered ? 0.1 : 0), lineWidth: 1)
+                )
         )
+        .scaleEffect(isHovered ? 1.02 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isHovered)
+        .onHover { hovering in
+            hoveredTile = hovering ? id : nil
+        }
     }
 
     // MARK: - API Usage Section

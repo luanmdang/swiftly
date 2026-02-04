@@ -5,6 +5,7 @@ struct StatusIndicatorView: View {
     @State private var isExpanded = false
     @State private var wavePhase: CGFloat = 0
     @State private var pulseScale: CGFloat = 1.0
+    @State private var hoverOffset: CGFloat = 0
     @State private var processingRotation: Double = 0
     @State private var successCheckmark: Bool = false
 
@@ -97,16 +98,10 @@ struct StatusIndicatorView: View {
     private var leftIndicator: some View {
         switch appState.status {
         case .recording:
-            ZStack {
-                Circle()
-                    .stroke(recordingPurple.opacity(0.5), lineWidth: 1.5)
-                    .scaleEffect(pulseScale)
-                    .opacity(2 - pulseScale)
-
-                Circle()
-                    .fill(recordingPurple)
-                    .frame(width: 8, height: 8)
-            }
+            Image(nsImage: NSImage(named: "swiftly_squiggle.png") ?? NSImage())
+                .resizable()
+                .scaledToFit()
+                .offset(y: hoverOffset)
 
         case .processing:
             Circle()
@@ -226,6 +221,9 @@ struct StatusIndicatorView: View {
         withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: false)) {
             pulseScale = 1.6
         }
+        withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+            hoverOffset = -2
+        }
         animateWave()
     }
 
@@ -246,6 +244,7 @@ struct StatusIndicatorView: View {
     private func stopRecordingAnimations() {
         withAnimation(.easeOut(duration: 0.2)) {
             pulseScale = 1.0
+            hoverOffset = 0
         }
     }
 
@@ -271,6 +270,7 @@ struct StatusIndicatorView: View {
     private func stopAllAnimations() {
         withAnimation(.easeOut(duration: 0.2)) {
             pulseScale = 1.0
+            hoverOffset = 0
             processingRotation = 0
             successCheckmark = false
             wavePhase = 0

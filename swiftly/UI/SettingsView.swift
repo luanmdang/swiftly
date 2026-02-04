@@ -10,6 +10,10 @@ struct SettingsView: View {
     @State private var isCodingMode: Bool = UserPreferences.shared.isCodingMode
     @State private var codingModeInstructions: String = UserPreferences.shared.codingModeInstructions
 
+    // Hover state tracking
+    @State private var hoveredCard: String? = nil
+    @State private var hoveredTab: AIProviderType? = nil
+
     enum SaveStatus {
         case idle
         case saved
@@ -386,8 +390,9 @@ struct SettingsView: View {
         )
     }
 
-    private func settingsCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading) {
+    private func settingsCard<Content: View>(id: String = "", @ViewBuilder content: () -> Content) -> some View {
+        let isHovered = hoveredCard == id && !id.isEmpty
+        return VStack(alignment: .leading) {
             content()
         }
         .padding(18)
@@ -397,9 +402,16 @@ struct SettingsView: View {
                 .fill(cardBg)
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
-                        .stroke(cardBorder, lineWidth: 1)
+                        .stroke(isHovered ? Color.white.opacity(0.12) : cardBorder, lineWidth: 1)
                 )
         )
+        .scaleEffect(isHovered ? 1.005 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isHovered)
+        .onHover { hovering in
+            if !id.isEmpty {
+                hoveredCard = hovering ? id : nil
+            }
+        }
     }
 
     private func cardHeader(icon: String, title: String) -> some View {
@@ -414,7 +426,9 @@ struct SettingsView: View {
     }
 
     private func providerTab(_ provider: AIProviderType) -> some View {
-        Button {
+        let isSelected = selectedProvider == provider
+        let isHovered = hoveredTab == provider
+        return Button {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 selectedProvider = provider
                 selectedModel = provider.defaultModel
@@ -424,7 +438,7 @@ struct SettingsView: View {
         } label: {
             HStack(spacing: 6) {
                 Text(provider.displayName)
-                    .font(.system(size: 11, weight: selectedProvider == provider ? .bold : .medium))
+                    .font(.system(size: 11, weight: isSelected ? .bold : .medium))
 
                 if KeychainManager.shared.hasAPIKey(for: provider) {
                     Image(systemName: "checkmark.circle.fill")
@@ -432,16 +446,19 @@ struct SettingsView: View {
                         .foregroundColor(.green)
                 }
             }
-            .foregroundColor(selectedProvider == provider ? textPrimary : textTertiary)
+            .foregroundColor(isSelected ? textPrimary : (isHovered ? textSecondary : textTertiary))
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
             .background(
-                selectedProvider == provider ?
-                    RoundedRectangle(cornerRadius: 6).fill(Color.white.opacity(0.08)) :
-                    RoundedRectangle(cornerRadius: 6).fill(Color.clear)
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(isSelected ? Color.white.opacity(0.08) : (isHovered ? Color.white.opacity(0.04) : Color.clear))
             )
+            .animation(.easeInOut(duration: 0.15), value: isHovered)
         }
         .buttonStyle(.plain)
+        .onHover { hovering in
+            hoveredTab = hovering ? provider : nil
+        }
     }
 
     private func permissionRow(icon: String, title: String, subtitle: String, isGranted: Bool) -> some View {

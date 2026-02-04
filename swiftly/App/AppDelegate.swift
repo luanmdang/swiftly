@@ -42,7 +42,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem.button {
-            if let icon = NSImage(named: "swiftly_squiggle") {
+            if let icon = NSImage(named: "swiftly_squiggle.png") {
                 icon.size = NSSize(width: 18, height: 18)
                 button.image = icon
             } else {
@@ -324,11 +324,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let hostingView = NSHostingView(rootView: settingsView)
 
         settingsWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 450, height: 600),
-            styleMask: [.titled, .closable],
+            contentRect: NSRect(x: 0, y: 0, width: 450, height: 620),
+            styleMask: [.titled, .closable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
+        settingsWindow?.titlebarAppearsTransparent = true
+        settingsWindow?.titleVisibility = .hidden
+        settingsWindow?.isMovableByWindowBackground = true
+        settingsWindow?.backgroundColor = NSColor(red: 0.04, green: 0.04, blue: 0.05, alpha: 1.0)
         settingsWindow?.title = "Swiftly Settings"
         settingsWindow?.contentView = hostingView
         settingsWindow?.center()
